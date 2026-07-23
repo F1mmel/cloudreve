@@ -1,13 +1,11 @@
-[中文版本](https://github.com/cloudreve/cloudreve/blob/master/README_zh-CN.md)
-
 <h1 align="center">
   <br>
   <a href="https://cloudreve.org/" alt="logo" ><img src="https://raw.githubusercontent.com/cloudreve/frontend/master/public/static/img/logo192.png" width="150"/></a>
   <br>
-  Cloudreve
+  Cloudreve Custom
   <br>
 </h1>
-<h4 align="center">Self-hosted file management system with multi-cloud support.</h4>
+<h4 align="center">Self-hosted file management system with custom background images, customizable default folder colors, and tinted file icons.</h4>
 
 <p align="center">
   <a href="https://dev.azure.com/abslantliu/cloudreve/_build?definitionId=6">
