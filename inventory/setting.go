@@ -73,12 +73,16 @@ func (c *settingClient) Gets(ctx context.Context, names []string) (map[string]st
 
 func (c *settingClient) Set(ctx context.Context, settings map[string]string) error {
 	for k, v := range settings {
-		if err := c.client.Setting.Update().Where(setting.Name(k)).SetValue(v).Exec(ctx); err != nil {
-			return fmt.Errorf("failed to create setting %q: %w", k, err)
+		affected, err := c.client.Setting.Update().Where(setting.Name(k)).SetValue(v).Save(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to update setting %q: %w", k, err)
 		}
-
+		if affected == 0 {
+			if err := c.client.Setting.Create().SetName(k).SetValue(v).Exec(ctx); err != nil {
+				return fmt.Errorf("failed to create setting %q: %w", k, err)
+			}
+		}
 	}
-
 	return nil
 }
 
@@ -484,6 +488,9 @@ var mailTemplateContents = []MailTemplateContent{
 }
 
 var DefaultSettings = map[string]string{
+	"custom_background_url":                      "",
+	"custom_default_folder_color":               "",
+	"custom_tint_file_icons":                    "0",
 	"siteURL":                                    `http://localhost:5212`,
 	"siteName":                                   `Cloudreve`,
 	"siteDes":                                    "Cloudreve",

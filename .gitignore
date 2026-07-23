@@ -37,4 +37,6 @@ data/
 tmp/
 .devcontainer/
 cloudreve
+cloudreve_linux_amd64
+temp_zip/
 .DS_Store

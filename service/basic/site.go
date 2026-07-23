@@ -19,13 +19,16 @@ type SiteConfig struct {
 	// Basic Section
 	InstanceID     string                  `json:"instance_id,omitempty"`
 	SiteName       string                  `json:"title,omitempty"`
-	Themes         string                  `json:"themes,omitempty"`
-	DefaultTheme   string                  `json:"default_theme,omitempty"`
-	User           *user.User              `json:"user,omitempty"`
-	Logo           string                  `json:"logo,omitempty"`
-	LogoLight      string                  `json:"logo_light,omitempty"`
-	CustomNavItems []setting.CustomNavItem `json:"custom_nav_items,omitempty"`
-	CustomHTML     *setting.CustomHTML     `json:"custom_html,omitempty"`
+	Themes               string                  `json:"themes,omitempty"`
+	DefaultTheme         string                  `json:"default_theme,omitempty"`
+	User                 *user.User              `json:"user,omitempty"`
+	Logo                 string                  `json:"logo,omitempty"`
+	LogoLight            string                  `json:"logo_light,omitempty"`
+	CustomNavItems       []setting.CustomNavItem `json:"custom_nav_items,omitempty"`
+	CustomHTML           *setting.CustomHTML     `json:"custom_html,omitempty"`
+	CustomBackgroundURL     string                  `json:"custom_background_url,omitempty"`
+	CustomDefaultFolderColor string                 `json:"custom_default_folder_color,omitempty"`
+	CustomTintFileIcons     string                  `json:"custom_tint_file_icons,omitempty"`
 
 	// Login Section
 	LoginCaptcha     bool                `json:"login_captcha,omitempty"`
@@ -99,6 +102,7 @@ func (s *GetSettingService) GetSiteConfig(c *gin.Context) (*SiteConfig, error) {
 			TosUrl:           legalDocs.TermsOfService,
 		}, nil
 	case "explorer":
+		bgURL, _ := dep.SettingClient().Get(c, "custom_background_url")
 		explorerSettings := settings.ExplorerFrontendSettings(c)
 		mapSettings := settings.MapSetting(c)
 		fileViewers := settings.FileViewers(c)
@@ -124,6 +128,7 @@ func (s *GetSettingService) GetSiteConfig(c *gin.Context) (*SiteConfig, error) {
 			CustomProps:          customProps,
 			ShowEncryptionStatus: showEncryptionStatus,
 			FullTextSearch:       settings.FTSEnabled(c),
+			CustomBackgroundURL:  bgURL,
 		}, nil
 	case "emojis":
 		emojis := settings.EmojiPresets(c)
@@ -191,23 +196,31 @@ func (s *GetSettingService) GetSiteConfig(c *gin.Context) (*SiteConfig, error) {
 	appSetting := settings.AppSetting(c)
 	customNavItems := settings.CustomNavItems(c)
 	customHTML := settings.CustomHTML(c)
+	bgSettings, _ := dep.SettingClient().Gets(c, []string{"custom_background_url", "custom_default_folder_color", "custom_tint_file_icons"})
+	bgURL := bgSettings["custom_background_url"]
+	folderColor := bgSettings["custom_default_folder_color"]
+	tintIcons := bgSettings["custom_tint_file_icons"]
+
 	return &SiteConfig{
-		InstanceID:      siteBasic.ID,
-		SiteName:        siteBasic.Name,
-		Themes:          themes.Themes,
-		DefaultTheme:    themes.DefaultTheme,
-		User:            &userRes,
-		Logo:            logo.Normal,
-		LogoLight:       logo.Light,
-		CaptchaType:     settings.CaptchaType(c),
-		TurnstileSiteID: settings.TurnstileCaptcha(c).Key,
-		ReCaptchaKey:    reCaptcha.Key,
-		CapInstanceURL:  capCaptcha.InstanceURL,
-		CapSiteKey:      capCaptcha.SiteKey,
-		CapAssetServer:  capCaptcha.AssetServer,
-		AppPromotion:    appSetting.Promotion,
-		CustomNavItems:  customNavItems,
-		CustomHTML:      customHTML,
+		InstanceID:               siteBasic.ID,
+		SiteName:                 siteBasic.Name,
+		Themes:                   themes.Themes,
+		DefaultTheme:             themes.DefaultTheme,
+		User:                     &userRes,
+		Logo:                     logo.Normal,
+		LogoLight:                logo.Light,
+		CaptchaType:              settings.CaptchaType(c),
+		TurnstileSiteID:          settings.TurnstileCaptcha(c).Key,
+		ReCaptchaKey:             reCaptcha.Key,
+		CapInstanceURL:           capCaptcha.InstanceURL,
+		CapSiteKey:               capCaptcha.SiteKey,
+		CapAssetServer:           capCaptcha.AssetServer,
+		AppPromotion:             appSetting.Promotion,
+		CustomNavItems:           customNavItems,
+		CustomHTML:               customHTML,
+		CustomBackgroundURL:      bgURL,
+		CustomDefaultFolderColor: folderColor,
+		CustomTintFileIcons:      tintIcons,
 	}, nil
 }
 

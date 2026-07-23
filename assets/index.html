@@ -1,0 +1,184 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="shortcut icon" href="{pwa_small_icon}" sizes="64x64" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,shrink-to-fit=no"
+    />
+    <meta name="theme-color" content="" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="description" content="{siteDes}" />
+    <title>{siteName}</title>
+    <script>
+      (function() {
+        try {
+          var isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var themeCache = localStorage.getItem('siteConfigCache_theme');
+          if (themeCache) {
+            var themeObj = JSON.parse(themeCache);
+            if (themeObj && themeObj.preferedDark !== undefined) {
+              isDark = themeObj.preferedDark;
+            }
+          }
+          if (isDark) {
+            document.documentElement.classList.add('is-dark');
+          }
+          var basicCache = localStorage.getItem('siteConfigCache_basic');
+          if (basicCache) {
+            var basic = JSON.parse(basicCache);
+            var bgUrl = basic && basic.config && basic.config.custom_background_url;
+            if (bgUrl) {
+              document.documentElement.style.setProperty('--loader-bg', 'url(' + bgUrl + ')');
+              document.documentElement.classList.add('has-loader-bg');
+            }
+          }
+        } catch(e) {}
+      })();
+    </script>
+    <style>
+      #app-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #f5f5f5;
+        z-index: 9999;
+      }
+      .is-dark #app-loader {
+        background-color: #121212;
+      }
+      .has-loader-bg #app-loader {
+        background-image: var(--loader-bg);
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+      }
+      .is-dark.has-loader-bg #app-loader {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), var(--loader-bg);
+      }
+      #app-loader .loader-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px;
+        border-radius: 8px;
+        background-color: #ffffff;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+      }
+      .is-dark #app-loader .loader-card {
+        background-color: #1e1e1e;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      }
+      .has-loader-bg #app-loader .loader-card {
+        background-color: rgba(18, 18, 18, 0.45);
+        backdrop-filter: blur(16px) saturate(180%);
+        -webkit-backdrop-filter: blur(16px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+      }
+      .has-loader-bg:not(.is-dark) #app-loader .loader-card {
+        background-color: rgba(255, 255, 255, 0.45);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+      }
+      #app-loader .logo {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 32px;
+        background-image: url("{pwa_medium_icon}");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+        opacity: 0;
+        transform: scale(0.8);
+        animation: fadeIn 0.6s ease-out 0.3s forwards;
+      }
+      #app-loader .spinner {
+        width: 40px;
+        height: 40px;
+        position: relative;
+        opacity: 0;
+        transform: scale(0.8);
+        animation: fadeIn 0.6s ease-out 0.3s forwards;
+      }
+      #app-loader .spinner svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      #app-loader .spinner .stroke {
+        stroke: var(--defaultThemeColor);
+        stroke-linecap: round;
+        animation: spinDash 1.4s ease-in-out infinite;
+      }
+      #app-loader .spinner .background {
+        stroke: rgba(0, 0, 0, 0.05);
+      }
+      .is-dark #app-loader .spinner .background {
+        stroke: rgba(255, 255, 255, 0.05);
+      }
+      .has-loader-bg #app-loader .spinner .background {
+        stroke: rgba(255, 255, 255, 0.1);
+      }
+
+      @keyframes spinDash {
+        0% {
+          stroke-dasharray: 1px, 200px;
+          stroke-dashoffset: 0;
+        }
+        50% {
+          stroke-dasharray: 100px, 200px;
+          stroke-dashoffset: -15px;
+        }
+        100% {
+          stroke-dasharray: 1px, 200px;
+          stroke-dashoffset: -126px;
+        }
+      }
+      @keyframes fadeIn {
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="app-loader">
+      <div class="loader-card">
+        <div class="logo"></div>
+        <div class="spinner">
+          <svg viewBox="22 22 44 44">
+            <circle class="background" cx="44" cy="44" r="20" fill="none" stroke-width="4"></circle>
+            <circle class="stroke" cx="44" cy="44" r="20" fill="none" stroke-width="4"></circle>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <script async type="module" src="/src/main.tsx"></script>
+    <div id="root"></div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Hide loader when the app has loaded
+        const appRoot = document.getElementById("root");
+        const observer = new MutationObserver(function (mutations) {
+          if (appRoot.children.length > 0) {
+            document.getElementById("app-loader").style.display = "none";
+            observer.disconnect();
+          }
+        });
+        observer.observe(appRoot, { childList: true });
+      });
+    </script>
+  </body>
+  {siteScript}
+</html>
