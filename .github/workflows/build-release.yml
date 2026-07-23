@@ -47,13 +47,17 @@ jobs:
           python3 -c "
           import os, zipfile
           os.makedirs('application/statics', exist_ok=True)
-          with zipfile.ZipFile('application/statics/assets.zip', 'w', zipfile.ZIP_DEFLATED) as z:
-              for root, _, files in os.walk('assets/build'):
+          assets_dir = os.path.abspath('assets')
+          build_dir = os.path.abspath('assets/build')
+          zip_path = os.path.abspath('application/statics/assets.zip')
+          with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as z:
+              for root, _, files in os.walk(build_dir):
                   for file in files:
                       full_path = os.path.join(root, file)
-                      rel_path = os.path.relpath(full_path, 'assets')
-                      z.write(full_path, rel_path)
-          print('Successfully generated application/statics/assets.zip')
+                      rel_path = os.path.relpath(full_path, assets_dir)
+                      arcname = os.path.join('assets', rel_path).replace('\\\\', '/')
+                      z.write(full_path, arcname)
+          print('Successfully generated application/statics/assets.zip with assets/build structure')
           "
 
       - name: Build Linux AMD64 Binary

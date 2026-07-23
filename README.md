@@ -34,7 +34,17 @@
 
 ![Screenshot](https://raw.githubusercontent.com/cloudreve/docs/master/images/homepage.png)
 
-## :sparkles: Features
+## :star2: Custom Features & Enhancements
+
+- 🌌 **Global Glassmorphism & Custom Background Image**: Set a global background image URL in Admin Customization with backdrop blur filters automatically applied across sidebars, top bars, dialogs, and main panels.
+- 🎨 **Default Folder Color**: Configure a global default color for all folders in the Admin Customization panel with a live preview. Individual folder color overrides via context menu are fully preserved.
+- 🖌️ **Use Tinted Icons**: Toggle custom folder colors to apply to specific file type icons (`.pdf`, `.exe`, `.zip`, `.mp3`, etc.) as well as generic/unregistered file types.
+- 📊 **Storage Treemap & Disk Space Diagram**: Interactive Treemap diagram (`/admin/treemap`) visualizing disk usage, folder hierarchy, and individual file sizes.
+- 🎯 **Excluded Sidebar Icons**: Navigation links and sidebar folder trees maintain clean theme colors without being overridden by folder colors.
+- 🎬 **Sleek Media Viewer**: Expanded media viewer dialog (96vw x 94vh) with dark glass backdrop blur and compact title headers.
+- 📦 **Automated GitHub CI/CD Releases**: Automated GitHub Actions workflow builds embedded Linux AMD64 and Windows AMD64 binaries and creates releases on every push.
+
+## :sparkles: Core Features
 
 - :cloud: Support storing files into Local, Remote node, OneDrive, S3 compatible API, Qiniu Kodo, Aliyun OSS, Tencent COS, Huawei Cloud OBS, Kingsoft Cloud KS3, Upyun.
 - :outbox_tray: Upload/Download in directly transmission from client to storage providers.
