@@ -1,0 +1,83 @@
+name: Build & Release
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build & Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Build Frontend Assets
+        run: |
+          cd assets
+          yarn install
+          yarn build
+          cd ..
+
+      - name: Package Embedded Assets Zip
+        run: |
+          python3 -c "
+          import os, zipfile
+          os.makedirs('application/statics', exist_ok=True)
+          with zipfile.ZipFile('application/statics/assets.zip', 'w', zipfile.ZIP_DEFLATED) as z:
+              for root, _, files in os.walk('assets/build'):
+                  for file in files:
+                      full_path = os.path.join(root, file)
+                      rel_path = os.path.relpath(full_path, 'assets')
+                      z.write(full_path, rel_path)
+          print('Successfully generated application/statics/assets.zip')
+          "
+
+      - name: Build Linux AMD64 Binary
+        run: |
+          GOOS=linux GOARCH=amd64 go build -ldflags "-s -w" -o cloudreve_linux_amd64 .
+          tar -czvf cloudreve_linux_amd64.tar.gz cloudreve_linux_amd64
+
+      - name: Build Windows AMD64 Binary
+        run: |
+          GOOS=windows GOARCH=amd64 go build -ldflags "-s -w" -o cloudreve_windows_amd64.exe .
+          zip cloudreve_windows_amd64.zip cloudreve_windows_amd64.exe
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v${{ github.run_number }}"
+          name: "Release v${{ github.run_number }}"
+          body: |
+            Automated build release for commit `${{ github.sha }}`.
+            Includes binaries for Linux AMD64 and Windows AMD64.
+          draft: false
+          prerelease: false
+          files: |
+            cloudreve_linux_amd64.tar.gz
+            cloudreve_windows_amd64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
